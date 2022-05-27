@@ -27,23 +27,27 @@ struct Train {
 std::mutex terminal;
 
 void travel (const Train& train) {
+    std::string outMessage;
     std::this_thread::sleep_for (std::chrono::seconds(train.travelTime));
 
     bool isFirstWaiting = true;
     while (true) {
         if (terminal.try_lock()) {
-            std::cout << train.name << " arrived" << std::endl;
+            outMessage = std::string() + train.name + " arrived\n";
+            std::cout << outMessage;
             auto command = inputSomething<std::string> ("");
             while (command != "depart") {
                 command = inputSomething<std::string> ("");
             }
-            std::cout << train.name << " departed\n" << std::endl;
+            outMessage = std::string() + train.name + " departed\n";
+            std::cout << outMessage;
             terminal.unlock();
             break;
         }
         else {
             if (isFirstWaiting) {
-                std::cout << train.name << " waiting" << std::endl;
+                outMessage = std::string() + train.name + " waiting\n";
+                std::cout << outMessage;
                 isFirstWaiting = false;
             }
         }
@@ -57,10 +61,7 @@ int main() {
     char name = 'A';
     for (auto& it : trains) {
         it.name = name;
-
-        std::string hint = "Enter the travel time for ";
-        hint.push_back(name);
-        hint += + " train (in seconds): ";
+        std::string hint = std::string() + "Enter the travel time for " + name + " train (in seconds): ";
         it.travelTime = inputSomething<unsigned>(hint);
         ++name;
     }
